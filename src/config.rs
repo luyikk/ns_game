@@ -19,7 +19,7 @@ impl Config {
         let path = {
             if !config_path.exists() {
                 let json_path = format!(
-                    "{}/config.toml",
+                    "{}/base_config.toml",
                     current_dir().expect("not found current dir").display()
                 );
                 let path = Path::new(&json_path);

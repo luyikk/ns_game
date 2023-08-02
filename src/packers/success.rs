@@ -5,6 +5,10 @@ use serde::{Deserialize, Serialize};
 pub struct Success {}
 
 /// 返回通用成功
+/// ``` ignore
+/// ret_success!();
+/// ret_success!(serial);
+/// ```
 #[macro_export]
 macro_rules! ret_success {
     () => {

@@ -1,6 +1,6 @@
 [package]
 name = "ns_game"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2021"
 authors = ["yi lu <luyikk@126.com>"]
 repository = "https://github.com/luyikk/ns_game"

@@ -20,8 +20,8 @@ lazy_static::lazy_static! {
 
     /// 配置
     pub static ref CONFIG:Config={
-        let path=format!("{}/config.toml", CURRENT_EXE_PATH.as_str());
-        Config::load_config(Path::new(&path)).expect("read config.toml error")
+        let path=format!("{}/base_config.toml", CURRENT_EXE_PATH.as_str());
+        Config::load_config(Path::new(&path)).expect("read base_config.toml error")
     };
 
     /// 代理管理器

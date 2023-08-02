@@ -46,6 +46,11 @@ impl<T: Serialize> IntoResult for T {
     }
 }
 
+/// 返回 序列化 Vec<u8> 结果
+/// ``` ignore
+///  ret!(Foo{..})
+///  ret!(Foo{..},serial)
+/// ```
 #[macro_export]
 macro_rules! ret {
     ($pack:expr) => {

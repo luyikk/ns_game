@@ -1,5 +1,7 @@
 use serde::Serialize;
 
+/// 无 serial 序列化 返回 Vec<u8>
+/// 一般用于消息广播
 #[macro_export]
 macro_rules! des {
     ($pack:expr) => {
