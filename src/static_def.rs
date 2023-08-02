@@ -1,8 +1,8 @@
-use aqueue::{Actor, RwModel};
+use aqueue::RwModel;
 use std::path::Path;
 
 use crate::config::Config;
-use crate::services::{BroadcastService, LinkPeerManager, MasterService, ProxyService};
+use crate::services::{BroadcastService, MasterService, ProxyService};
 
 lazy_static::lazy_static! {
       /// 当前运行路径
@@ -24,19 +24,14 @@ lazy_static::lazy_static! {
         Config::load_config(Path::new(&path)).expect("read config.toml error")
     };
 
-     /// PEER 管理器
-    pub static ref PEERS:Actor<LinkPeerManager<()>>={
-        Actor::new(LinkPeerManager::new())
-    };
-
     /// 代理管理器
     pub static ref PROXY:RwModel<ProxyService>={
-        RwModel::new(ProxyService::new())
+        RwModel::new(ProxyService::default())
     };
 
     /// 广播服务
     pub static ref BROADCAST_SERVICE:BroadcastService={
-        BroadcastService::new()
+        BroadcastService
     };
 
     /// MASTER 服务器

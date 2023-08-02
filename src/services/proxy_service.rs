@@ -6,19 +6,13 @@ use std::collections::HashMap;
 use std::sync::Arc;
 
 /// 代理服务器查询器
+#[derive(Default)]
 pub struct ProxyService {
     proxy_map: HashMap<usize, i64>,
     manager: Option<Arc<dyn ITokenManager<ProxyController>>>,
 }
 
 impl ProxyService {
-    pub fn new() -> Self {
-        Self {
-            proxy_map: Default::default(),
-            manager: None,
-        }
-    }
-
     /// 设置 netx token管理器
     #[inline]
     fn set_manager(&mut self, manager: Arc<dyn ITokenManager<ProxyController>>) {

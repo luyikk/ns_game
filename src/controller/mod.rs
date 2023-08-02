@@ -11,8 +11,8 @@ pub use proxy_interface::*;
 
 /// 代理控制器
 pub struct ProxyController {
-    pub(crate) token: NetxToken<Self>,
-    pub(crate) proxy_id: AtomicUsize,
+    pub token: NetxToken<Self>,
+    pub proxy_id: AtomicUsize,
 }
 
 impl Drop for ProxyController {

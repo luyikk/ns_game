@@ -1,27 +1,28 @@
 use anyhow::{bail, ensure, Result};
 use aqueue::Actor;
 use std::collections::HashMap;
-use std::sync::atomic::{AtomicBool, AtomicI32, AtomicI64, AtomicU64, AtomicUsize, Ordering};
 use std::sync::Arc;
 
-use crate::peer::{GamePeer, Peer};
+use crate::peer::IPeer;
 use crate::static_def::CONFIG;
 use crate::time::{timestamp, SECOND, TICK};
 
 /// PEER管理器
 pub struct LinkPeerManager<T> {
-    peers: HashMap<u64, Peer<T>>,
+    peers: HashMap<u64, Arc<T>>,
     index: u64,
 }
 
-impl<T: Default + Send + Sync + 'static> LinkPeerManager<T> {
-    pub fn new() -> Self {
+impl<T> Default for LinkPeerManager<T> {
+    fn default() -> Self {
         Self {
             peers: Default::default(),
             index: 0,
         }
     }
+}
 
+impl<T: IPeer + 'static> LinkPeerManager<T> {
     ///新建PEER
     #[inline]
     fn create_peer(&mut self, account_id: i32) -> Result<u64> {
@@ -30,17 +31,8 @@ impl<T: Default + Send + Sync + 'static> LinkPeerManager<T> {
 
         ensure!(!self.peers.contains_key(&token), "token exits");
 
-        self.peers.insert(
-            token,
-            Arc::new(GamePeer {
-                token: AtomicU64::new(token),
-                proxy_id: AtomicUsize::new(0),
-                account_id: AtomicI32::new(account_id),
-                is_disconnect: AtomicBool::new(true),
-                last_net_time: AtomicI64::new(timestamp()),
-                inner: Default::default(),
-            }),
-        );
+        self.peers
+            .insert(token, Arc::new(IPeer::create(token, account_id)));
 
         log::info!("create peer token:{}", token);
 
@@ -49,7 +41,7 @@ impl<T: Default + Send + Sync + 'static> LinkPeerManager<T> {
 
     /// 获取peer
     #[inline]
-    fn get_peer(&self, token: u64) -> Option<Peer<T>> {
+    fn get_peer(&self, token: u64) -> Option<Arc<T>> {
         self.peers.get(&token).cloned()
     }
 
@@ -58,9 +50,9 @@ impl<T: Default + Send + Sync + 'static> LinkPeerManager<T> {
     #[inline]
     fn peer_connect(&self, proxy_id: usize, account_id: i32, token: u64) -> Result<()> {
         if let Some(peer) = self.peers.get(&token) {
-            if peer.account_id.load(Ordering::Acquire) == account_id {
-                peer.proxy_id.store(proxy_id, Ordering::Release);
-                peer.is_disconnect.store(false, Ordering::Release);
+            if peer.get_account_id() == account_id {
+                peer.set_proxy_id(proxy_id);
+                peer.set_disconnect(false);
                 log::info!("peer token:{} connect", token);
                 Ok(())
             } else {
@@ -74,7 +66,7 @@ impl<T: Default + Send + Sync + 'static> LinkPeerManager<T> {
     /// 根据账号id 获取所有的peer
     /// 一个账号可对应多个peer
     #[inline]
-    fn get_peer_by_account_id(&self, account_id: i32) -> Vec<Peer<T>> {
+    fn get_peer_by_account_id(&self, account_id: i32) -> Vec<Arc<T>> {
         self.peers
             .clone()
             .values()
@@ -92,7 +84,7 @@ impl<T: Default + Send + Sync + 'static> LinkPeerManager<T> {
     #[inline]
     fn disconnect(&mut self, token: u64) {
         if let Some(peer) = self.peers.get(&token) {
-            peer.is_disconnect.store(true, Ordering::Release);
+            peer.set_disconnect(true);
             log::debug!("peer token:{} disconnect", token);
             let peer = peer.clone();
             tokio::spawn(async move {
@@ -137,17 +129,12 @@ impl<T: Default + Send + Sync + 'static> LinkPeerManager<T> {
 }
 
 #[async_trait::async_trait]
-pub trait ILinkPeerManager<T> {
+pub trait ILinkPeerManager: Send + Sync {
     /// 新建PEER
     async fn create_peer(&self, account_id: i32) -> Result<u64>;
     /// 长连接携带token链接
     /// 返回false表示token没找到
     async fn connect_token(&self, proxy_id: usize, account_id: i32, token: u64) -> Result<()>;
-    /// 获取peer
-    fn get_peer(&self, token: u64) -> Option<Peer<T>>;
-    /// 根据账号id 获取所有的peer
-    /// 一个账号可对应多个peer
-    fn get_peer_by_account_id(&self, account_id: i32) -> Vec<Peer<T>>;
     /// 断线
     async fn disconnect_token(&self, token: u64);
     /// 清理需要清理的peer
@@ -156,8 +143,16 @@ pub trait ILinkPeerManager<T> {
     async fn disconnect_for_proxy(&self, proxy_id: usize);
 }
 
+pub trait ILinkPeerManagerPeer<T>: ILinkPeerManager {
+    /// 获取peer
+    fn get_peer(&self, token: u64) -> Option<Arc<T>>;
+    /// 根据账号id 获取所有的peer
+    /// 一个账号可对应多个peer
+    fn get_peer_by_account_id(&self, account_id: i32) -> Vec<Arc<T>>;
+}
+
 #[async_trait::async_trait]
-impl<T: Default + Send + Sync + 'static> ILinkPeerManager<T> for Actor<LinkPeerManager<T>> {
+impl<T: IPeer + 'static> ILinkPeerManager for Actor<LinkPeerManager<T>> {
     #[inline]
     async fn create_peer(&self, account_id: i32) -> Result<u64> {
         self.inner_call(|inner| async move { inner.get_mut().create_peer(account_id) })
@@ -170,16 +165,6 @@ impl<T: Default + Send + Sync + 'static> ILinkPeerManager<T> for Actor<LinkPeerM
             |inner| async move { inner.get_mut().peer_connect(proxy_id, account_id, token) },
         )
         .await
-    }
-
-    #[inline]
-    fn get_peer(&self, token: u64) -> Option<Peer<T>> {
-        unsafe { self.deref_inner().get_peer(token) }
-    }
-
-    #[inline]
-    fn get_peer_by_account_id(&self, account_id: i32) -> Vec<Peer<T>> {
-        unsafe { self.deref_inner().get_peer_by_account_id(account_id) }
     }
 
     #[inline]
@@ -198,5 +183,17 @@ impl<T: Default + Send + Sync + 'static> ILinkPeerManager<T> for Actor<LinkPeerM
     async fn disconnect_for_proxy(&self, proxy_id: usize) {
         self.inner_call(|inner| async move { inner.get_mut().disconnect_for_proxy(proxy_id) })
             .await
+    }
+}
+
+impl<T: IPeer + 'static> ILinkPeerManagerPeer<T> for Actor<LinkPeerManager<T>> {
+    #[inline]
+    fn get_peer(&self, token: u64) -> Option<Arc<T>> {
+        unsafe { self.deref_inner().get_peer(token) }
+    }
+
+    #[inline]
+    fn get_peer_by_account_id(&self, account_id: i32) -> Vec<Arc<T>> {
+        unsafe { self.deref_inner().get_peer_by_account_id(account_id) }
     }
 }

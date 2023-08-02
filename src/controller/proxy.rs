@@ -1,11 +1,10 @@
 use crate::controller::ProxyController;
-use crate::services::{ILinkPeerManager, IProxyService};
-use crate::static_def::{PEERS, PROXY};
-use crate::{ret_err, ret_error};
-use anyhow::{ensure, Result};
+use crate::services::IProxyService;
+use crate::static_def::PROXY;
+use crate::GAME;
+use anyhow::{ensure, Context, Result};
 use netxserver::prelude::tcpserver::IPeer;
 use netxserver::prelude::*;
-use serde_json::Value;
 use std::sync::atomic::Ordering;
 
 #[build(ProxyController)]
@@ -29,10 +28,6 @@ pub trait IProxyController {
     /// 数据request
     #[tag(2001)]
     async fn func(&self, account_id: i32, token: u64, data: Vec<u8>) -> Result<Vec<u8>>;
-
-    /// 匿名调用 不需要登录
-    #[tag(2002)]
-    async fn anonymous_call_on(&self, data: Vec<u8>) -> Result<Vec<u8>>;
 }
 
 #[build_impl]
@@ -67,7 +62,11 @@ impl IProxyController for ProxyController {
             }
         }
         PROXY.remove(proxy_id).await;
-        PEERS.disconnect_for_proxy(proxy_id).await;
+        GAME.get()
+            .context("not install game")?
+            .peers
+            .disconnect_for_proxy(proxy_id)
+            .await;
         Ok(())
     }
 
@@ -84,54 +83,38 @@ impl IProxyController for ProxyController {
     /// 新建peer token
     #[inline]
     async fn create_token(&self, account_id: i32) -> Result<u64> {
-        PEERS.create_peer(account_id).await
+        GAME.get()
+            .context("not install game")?
+            .peers
+            .create_peer(account_id)
+            .await
     }
 
     /// 长连接携带token链接
     #[inline]
     async fn connect_token(&self, account_id: i32, token: u64) -> Result<()> {
         let proxy_id = self.proxy_id.load(Ordering::Acquire);
-        PEERS.connect_token(proxy_id, account_id, token).await
+        GAME.get()
+            .context("not install game")?
+            .peers
+            .connect_token(proxy_id, account_id, token)
+            .await
     }
 
     /// peer 断线
     #[inline]
     async fn disconnect_token(&self, token: u64) {
-        PEERS.disconnect_token(token).await;
+        GAME.get()
+            .context("not install game")
+            .unwrap()
+            .peers
+            .disconnect_token(token)
+            .await;
     }
 
     /// 功能调用
     #[inline]
     async fn func(&self, account_id: i32, token: u64, data: Vec<u8>) -> Result<Vec<u8>> {
-        let jv: Value = serde_json::from_str(std::str::from_utf8(&data)?)?;
-        let serial = jv["serial"].as_i64();
-        if let Some(peer) = PEERS.get_peer(token) {
-            if peer.get_account_id() != account_id {
-                ret_error!(serial, -1000002, "token account error")
-            }
-
-            peer.update();
-            match self.func(peer, serial, jv).await {
-                Ok(result) => Ok(result),
-                Err(err) => {
-                    ret_error!(serial,-1000001;"error:{}", err);
-                }
-            }
-        } else {
-            ret_error!(serial, -1000000, "token does not exist")
-        }
-    }
-
-    /// 调用加载
-    #[inline]
-    async fn anonymous_call_on(&self, data: Vec<u8>) -> Result<Vec<u8>> {
-        let proxy_id = self.proxy_id.load(Ordering::Acquire);
-        let jv: Value = serde_json::from_str(std::str::from_utf8(&data)?)?;
-        match self.anonymous_call_on(proxy_id, jv).await {
-            Ok(result) => Ok(result),
-            Err(err) => {
-                ret_err!(-1000001;"error:{}", err)
-            }
-        }
+        (GAME.get().context("not found game install")?.func)(self, account_id, token, data).await
     }
 }

@@ -1,15 +1,8 @@
-mod clean_account_info_timer;
-mod clean_peer_timer;
-
-
 use anyhow::Result;
 use log::*;
 use std::cell::RefCell;
 use std::sync::atomic::{AtomicBool, Ordering};
 use tokio::time::{sleep, Duration};
-
-pub use clean_account_info_timer::*;
-pub use clean_peer_timer::*;
 
 /// 定时器
 #[async_trait::async_trait]

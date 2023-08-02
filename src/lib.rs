@@ -13,21 +13,22 @@ pub mod peer;
 pub mod services;
 pub mod static_def;
 pub mod time;
+pub mod timer;
 
 /// 静态安装配置
 pub static GAME: tokio::sync::OnceCell<Game> = tokio::sync::OnceCell::const_new();
 
+pub type Func =
+    for<'a> fn(&'a ProxyController, i32, u64, Vec<u8>) -> BoxFuture<'a, Result<Vec<u8>>>;
+
 /// 基本安装
 pub struct Game {
     pub peers: Arc<dyn ILinkPeerManager>,
-    pub func: for<'a> fn(&'a ProxyController, i32, u64, Vec<u8>) -> BoxFuture<'a, Result<Vec<u8>>>,
+    pub func: Func,
 }
 
 impl Game {
-    pub async fn start(
-        peers: Arc<dyn ILinkPeerManager>,
-        func: for<'a> fn(&'a ProxyController, i32, u64, Vec<u8>) -> BoxFuture<'a, Result<Vec<u8>>>,
-    ) -> Result<()> {
+    pub async fn start(peers: Arc<dyn ILinkPeerManager>, func: Func) -> Result<()> {
         GAME.set(Self { peers, func })
             .map_err(|_| anyhow!("not install game"))?;
 

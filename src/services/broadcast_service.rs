@@ -5,13 +5,10 @@ use anyhow::Result;
 use netxserver::prelude::*;
 
 /// 广播服务
+#[derive(Default)]
 pub struct BroadcastService;
 
 impl BroadcastService {
-    pub fn new() -> Self {
-        BroadcastService
-    }
-
     /// 广播到 所有服务器的此玩家 所有连接
     /// 一般用于资产发生变化
     #[inline]
