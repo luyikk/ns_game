@@ -32,4 +32,28 @@ impl MasterService {
         let server = impl_ref!(self.client=>IMaster);
         server.get_player_info(account_id).await
     }
+
+    /// 老虎机请求旋转
+    #[inline]
+    pub async fn req_slot_spin(
+        &self,
+        account_id: i32,
+        token: u64,
+        req: ReqSlotSpin,
+    ) -> Result<SlotSpinRet> {
+        let server = impl_ref!(self.client=>IMaster);
+        server.req_slot_spin(account_id, token, req).await
+    }
+
+    /// 老虎机请求退钱
+    #[inline]
+    pub async fn req_slot_refund(
+        &self,
+        account_id: i32,
+        token: u64,
+        req: ReqSlotRefund,
+    ) -> Result<SlotRefundRet> {
+        let server = impl_ref!(self.client=>IMaster);
+        server.req_slot_refund(account_id, token, req).await
+    }
 }
