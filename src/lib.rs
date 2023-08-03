@@ -32,6 +32,7 @@ pub struct Game {
 }
 
 impl Game {
+    /// 安装服务
     pub async fn init(
         peers: Arc<dyn ILinkPeerManager>,
         func: Func,
