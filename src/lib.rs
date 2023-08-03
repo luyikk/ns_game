@@ -1,11 +1,3 @@
-use crate::controller::{ImplCreateProxyController, ProxyController};
-use crate::services::{ILinkPeerManager, IProxyService};
-use crate::static_def::{BASE_CONFIG, MASTER_SERVICE, PROXY};
-use anyhow::{anyhow, Result};
-use futures::future::BoxFuture;
-use netxserver::prelude::NetXServer;
-use std::sync::Arc;
-
 pub mod config;
 pub mod controller;
 pub mod packers;
@@ -14,6 +6,16 @@ pub mod services;
 pub mod static_def;
 pub mod time;
 pub mod timer;
+
+
+use anyhow::{anyhow, Result};
+use futures::future::BoxFuture;
+use netxserver::prelude::NetXServer;
+use std::sync::Arc;
+
+use crate::controller::{ImplCreateProxyController, ProxyController};
+use crate::services::{ILinkPeerManager, IProxyService};
+use crate::static_def::{BASE_CONFIG, MASTER_SERVICE, PROXY};
 
 /// 静态安装配置
 pub static GAME: tokio::sync::OnceCell<Game> = tokio::sync::OnceCell::const_new();
@@ -28,7 +30,7 @@ pub struct Game {
 }
 
 impl Game {
-    pub async fn start(peers: Arc<dyn ILinkPeerManager>, func: Func) -> Result<()> {
+    pub async fn init(peers: Arc<dyn ILinkPeerManager>, func: Func) -> Result<NetXServer<ImplCreateProxyController>> {
         GAME.set(Self { peers, func })
             .map_err(|_| anyhow!("not install game"))?;
 
@@ -44,7 +46,6 @@ impl Game {
             .await;
         // 开始服务器,堵塞模式
         log::info!("starting ns game service:{}",BASE_CONFIG.base.server_id);
-        server.start_block().await?;
-        Ok(())
+        Ok(server)
     }
 }
