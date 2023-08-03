@@ -10,6 +10,7 @@ pub mod timer;
 use anyhow::{anyhow, Result};
 use futures::future::BoxFuture;
 use netxserver::prelude::NetXServer;
+use once_cell::sync::OnceCell;
 use std::sync::Arc;
 
 use crate::controller::{ImplCreateProxyController, ProxyController};
@@ -17,7 +18,7 @@ use crate::services::{ILinkPeerManager, IProxyService};
 use crate::static_def::{BASE_CONFIG, MASTER_SERVICE, PROXY};
 
 /// 静态安装配置
-pub static GAME: tokio::sync::OnceCell<Game> = tokio::sync::OnceCell::const_new();
+pub static GAME: OnceCell<Game> = OnceCell::new();
 
 pub type Func =
     for<'a> fn(&'a ProxyController, i32, u64, Vec<u8>) -> BoxFuture<'a, Result<Vec<u8>>>;
