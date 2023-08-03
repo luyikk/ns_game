@@ -88,3 +88,28 @@ pub struct SlotRefundInfo {
     /// 账号信息
     pub money_info: TableAccountMoney,
 }
+
+/// 游戏彩金信息
+#[derive(Deserialize,Serialize)]
+pub struct LotteryInfo {
+    /// 彩金ID
+    pub lottery_id: i32,
+    /// 大厅展示 0不展示  1,是基本展示,101-福树 102-冒火 103-闪电
+    pub hall_show: i32,
+    /// 彩金类型 0为常规 其他为有奖 1普通奖励 2小奖分值 3中奖分值 4大奖分值 5巨奖分值
+    pub lottery_type: i32,
+    /// 彩金的属性:0倍数还是 1钱
+    pub bet_or_money: i32,
+    /// 当前的彩金值/彩金倍数
+    pub lottery_real: i64,
+    /// 彩金属性为倍数时,彩金最小倍数
+    pub lottery_min_bet: i64,
+    /// 彩金属性为倍数时,彩金最大倍数
+    pub lottery_max_bet: i64,
+    /// 该彩金最小的押注,超过该值才能影响彩金的变动
+    pub coin_min: i64,
+    /// 该彩金的增量 ,用于客服端模拟自增
+    pub lottery_real_increment: i32,
+    /// 该彩金关联的游戏
+    pub game_ids: Vec<u32>,
+}

@@ -43,8 +43,8 @@ impl Game {
             .set_manager(server.get_token_manager().upgrade().unwrap())
             .await;
         // 开始服务器,堵塞模式
+        log::info!("starting ns game service:{}",BASE_CONFIG.base.server_id);
         server.start_block().await?;
-
         Ok(())
     }
 }

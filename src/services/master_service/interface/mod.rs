@@ -32,4 +32,7 @@ pub trait IMaster {
         token: u64,
         req: ReqSlotRefund,
     ) -> Result<SlotRefundRet>;
+    /// 请求彩金信息
+    #[tag(104)]
+    async fn get_game_lottery(&self, game_id: u32) -> Result<Vec<LotteryInfo>>;
 }
