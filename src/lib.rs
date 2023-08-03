@@ -20,6 +20,8 @@ use crate::static_def::{BASE_CONFIG, MASTER_SERVICE, PROXY};
 /// 静态安装配置
 pub static GAME: OnceCell<Game> = OnceCell::new();
 
+/// 数据处理函数指针
+/// 用于外导入
 pub type Func =
     for<'a> fn(&'a ProxyController, i32, u64, Vec<u8>) -> BoxFuture<'a, Result<Vec<u8>>>;
 
