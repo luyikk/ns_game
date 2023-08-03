@@ -15,7 +15,7 @@ pub struct Config {
 impl Config {
     ///加载
     pub fn load_config(content: &str) -> Result<Self> {
-        Ok(toml::from_str(&content)?)
+        Ok(toml::from_str(content)?)
     }
 }
 
