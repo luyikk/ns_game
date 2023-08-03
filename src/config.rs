@@ -43,8 +43,6 @@ impl Config {
 pub struct BaseConfig {
     /// 服务器id
     pub server_id: u32,
-    /// 游戏id
-    pub game_id: u32,
     /// 服务器 PEER 清理时间
     pub peer_clean_timeout_sec: i64,
     /// 缓存的account信息 多久没访问清理(秒)

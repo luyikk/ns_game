@@ -2,8 +2,6 @@
 [base]
 # 服务器id
 server_id=10251
-# 游戏id
-game_id=251
 # peer 没通信多久清理(秒)
 peer_clean_timeout_sec = 300
 # 缓存的account信息 多久没访问清理(秒)

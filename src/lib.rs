@@ -1,6 +1,6 @@
 use crate::controller::{ImplCreateProxyController, ProxyController};
 use crate::services::{ILinkPeerManager, IProxyService};
-use crate::static_def::{CONFIG, MASTER_SERVICE, PROXY};
+use crate::static_def::{BASE_CONFIG, MASTER_SERVICE, PROXY};
 use anyhow::{anyhow, Result};
 use futures::future::BoxFuture;
 use netxserver::prelude::NetXServer;
@@ -32,12 +32,13 @@ impl Game {
         GAME.set(Self { peers, func })
             .map_err(|_| anyhow!("not install game"))?;
 
-        if let Err(err) = MASTER_SERVICE.init(CONFIG.base.server_id).await {
+        if let Err(err) = MASTER_SERVICE.init(BASE_CONFIG.base.server_id).await {
             log::error!("connect master server error:{}", err);
         }
 
         //新建服务器,需要设置和接口实现
-        let server = NetXServer::new(CONFIG.proxy_listen.clone(), ImplCreateProxyController).await;
+        let server =
+            NetXServer::new(BASE_CONFIG.proxy_listen.clone(), ImplCreateProxyController).await;
         PROXY
             .set_manager(server.get_token_manager().upgrade().unwrap())
             .await;

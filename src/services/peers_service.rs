@@ -4,7 +4,7 @@ use std::collections::HashMap;
 use std::sync::Arc;
 
 use crate::peer::IPeer;
-use crate::static_def::CONFIG;
+use crate::static_def::BASE_CONFIG;
 use crate::time::{timestamp, SECOND, TICK};
 
 /// PEER管理器
@@ -121,7 +121,7 @@ impl<T: IPeer + 'static> LinkPeerManager<T> {
     #[inline]
     fn cleans(&mut self) -> Result<()> {
         let now = timestamp();
-        let timeout = CONFIG.base.peer_clean_timeout_sec * SECOND * TICK;
+        let timeout = BASE_CONFIG.base.peer_clean_timeout_sec * SECOND * TICK;
         self.peers
             .retain(|_, v| !v.is_disconnect() || v.comparison_time(now) < timeout);
         Ok(())
