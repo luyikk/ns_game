@@ -18,7 +18,7 @@ impl MasterService {
     }
 
     /// 安装控制器
-    pub async fn init(&self, server_id: u32) -> Result<()> {
+    pub(crate) async fn init(&self, server_id: u32) -> Result<()> {
         self.client
             .init(MasterController::new(server_id, self.client.clone()))
             .await?;
@@ -55,5 +55,12 @@ impl MasterService {
     ) -> Result<SlotRefundRet> {
         let server = impl_ref!(self.client=>IMaster);
         server.req_slot_refund(account_id, token, req).await
+    }
+
+    /// 获取彩金信息
+    #[inline]
+    pub async fn get_lottery_info(&self, game_id: u32) -> Result<Vec<LotteryInfo>> {
+        let server = impl_ref!(self.client=>IMaster);
+        server.get_game_lottery(game_id).await
     }
 }

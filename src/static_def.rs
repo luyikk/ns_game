@@ -1,4 +1,5 @@
 use aqueue::RwModel;
+use std::env::current_dir;
 use std::path::Path;
 
 use crate::config::Config;
@@ -20,8 +21,9 @@ lazy_static::lazy_static! {
 
     /// 配置
     pub static ref BASE_CONFIG:Config={
-        let path=format!("{}/base_config.toml", CURRENT_EXE_PATH.as_str());
-        Config::load_config(Path::new(&path)).expect("read base_config.toml error")
+        Config::load_config(&load_content("base_config.toml")
+            .expect("read base_config.toml file error"))
+            .expect("toml base_config.toml error")
     };
 
     /// 代理管理器
@@ -38,4 +40,30 @@ lazy_static::lazy_static! {
     pub static ref MASTER_SERVICE:MasterService={
         MasterService::new(BASE_CONFIG.master.clone())
     };
+}
+
+/// 加载文件内容
+#[inline]
+pub fn load_content(filename: &str) -> std::io::Result<String> {
+    let exe_path = format!("{}/{}", CURRENT_EXE_PATH.as_str(), filename);
+    let config_path = Path::new(&exe_path);
+    let path = {
+        if !config_path.exists() {
+            let json_path = format!(
+                "{}/{}",
+                current_dir().expect("not found current dir").display(),
+                filename
+            );
+            let path = Path::new(&json_path);
+            if !path.exists() {
+                panic!("not found config file:{path:?}");
+            } else {
+                path.to_path_buf()
+            }
+        } else {
+            config_path.to_path_buf()
+        }
+    };
+
+    std::fs::read_to_string(path)
 }

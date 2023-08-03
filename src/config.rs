@@ -1,7 +1,5 @@
 use anyhow::Result;
 use serde::Deserialize;
-use std::env::current_dir;
-use std::path::Path;
 
 /// 大厅配置
 #[derive(Debug, Deserialize, Clone)]
@@ -15,25 +13,8 @@ pub struct Config {
 }
 
 impl Config {
-    pub fn load_config(config_path: &Path) -> Result<Self> {
-        let path = {
-            if !config_path.exists() {
-                let json_path = format!(
-                    "{}/base_config.toml",
-                    current_dir().expect("not found current dir").display()
-                );
-                let path = Path::new(&json_path);
-                if !path.exists() {
-                    panic!("not found config file:{path:?}");
-                } else {
-                    path.to_path_buf()
-                }
-            } else {
-                config_path.to_path_buf()
-            }
-        };
-
-        let content = std::fs::read_to_string(path)?;
+    ///加载
+    pub fn load_config(content: &str) -> Result<Self> {
         Ok(toml::from_str(&content)?)
     }
 }
