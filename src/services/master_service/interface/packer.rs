@@ -90,7 +90,7 @@ pub struct SlotRefundInfo {
 }
 
 /// 游戏彩金信息
-#[derive(Deserialize,Serialize)]
+#[derive(Deserialize, Serialize)]
 pub struct LotteryInfo {
     /// 彩金ID
     pub lottery_id: i32,

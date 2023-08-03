@@ -7,7 +7,6 @@ pub mod static_def;
 pub mod time;
 pub mod timer;
 
-
 use anyhow::{anyhow, Result};
 use futures::future::BoxFuture;
 use netxserver::prelude::NetXServer;
@@ -30,7 +29,10 @@ pub struct Game {
 }
 
 impl Game {
-    pub async fn init(peers: Arc<dyn ILinkPeerManager>, func: Func) -> Result<NetXServer<ImplCreateProxyController>> {
+    pub async fn init(
+        peers: Arc<dyn ILinkPeerManager>,
+        func: Func,
+    ) -> Result<NetXServer<ImplCreateProxyController>> {
         GAME.set(Self { peers, func })
             .map_err(|_| anyhow!("not install game"))?;
 
@@ -45,7 +47,7 @@ impl Game {
             .set_manager(server.get_token_manager().upgrade().unwrap())
             .await;
         // 开始服务器,堵塞模式
-        log::info!("starting ns game service:{}",BASE_CONFIG.base.server_id);
+        log::info!("starting ns game service:{}", BASE_CONFIG.base.server_id);
         Ok(server)
     }
 }
