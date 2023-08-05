@@ -84,36 +84,3 @@ pub struct GetTokenResult {
     /// 超时时间
     pub timeout: i64,
 }
-
-/// 获取玩家信息数据包
-#[derive(Serialize)]
-pub struct GetUserInfoResult<'a> {
-    /// 玩家账号id
-    pub account_id: i32,
-    /// 玩家昵称
-    pub nickname: Cow<'a, str>,
-    /// 玩家头像id
-    pub avatar_id: i32,
-    /// 玩家email
-    pub email: Cow<'a, str>,
-    /// 玩家渠道id
-    pub channel_id: i32,
-    /// 玩家累计充值金额
-    pub total_recharge: f64,
-    /// 玩家累计退款金额
-    pub total_refund: f64,
-    /// 玩家身上金币
-    pub money: f64,
-    /// 玩家保险箱金币
-    pub money_safe: f64,
-    /// 玩家绑定金币
-    pub money_gift: f64,
-    /// 玩家绑定金币保险箱
-    pub money_gift_safe: f64,
-    /// 玩家累计洗码值
-    pub amount_of_wash_code: f64,
-    /// 玩家vip等级
-    pub vip_level: i32,
-    /// 汇率比例
-    pub money_exchange_coin: i64,
-}
