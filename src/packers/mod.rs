@@ -6,7 +6,6 @@ use anyhow::Result;
 use serde::{Deserialize, Serialize};
 use serde_type_name::type_name;
 
-
 /// 用于快速将packer转换成发送结果
 pub trait IntoResult {
     fn to(self, serial: Option<i64>) -> Result<Vec<u8>>;
