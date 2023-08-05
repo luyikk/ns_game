@@ -18,10 +18,12 @@ pub trait IPeer: Display + Send + Sync {
     fn set_proxy_id(&self, proxy_id: usize);
     /// 设置断线状态
     fn set_disconnect(&self, disconnect: bool);
-    /// 断线回调
-    async fn on_disconnect(&self) -> Result<()>;
     /// 获取是否断线
     fn is_disconnect(&self) -> bool;
     /// 对比时间 返回差值 tick
     fn comparison_time(&self, timestamp: i64) -> i64;
+    /// 断线回调
+    async fn on_disconnect(&self) -> Result<()>;
+    /// 清除回调
+    async fn on_clean(&self) -> Result<()>;
 }

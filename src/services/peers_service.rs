@@ -119,11 +119,35 @@ impl<T: IPeer + 'static> LinkPeerManager<T> {
 
     /// 清理需要清理的peer
     #[inline]
-    fn cleans(&mut self) -> Result<()> {
+    async fn cleans(&mut self) -> Result<()> {
         let now = timestamp();
         let timeout = BASE_CONFIG.base.peer_clean_timeout_sec * SECOND * TICK;
-        self.peers
-            .retain(|_, v| !v.is_disconnect() || v.comparison_time(now) < timeout);
+        // self.peers
+        //     .drain(|_, v| !v.is_disconnect() || v.comparison_time(now) < timeout);
+
+        let cleans = self
+            .peers
+            .iter()
+            .filter_map(|(k, v)| {
+                if v.is_disconnect() && v.comparison_time(now) >= timeout {
+                    Some(*k)
+                } else {
+                    None
+                }
+            })
+            .collect::<Vec<_>>();
+
+        let clean_peers = cleans
+            .into_iter()
+            .filter_map(|k| self.peers.remove(&k))
+            .collect::<Vec<_>>();
+
+        for peer in clean_peers {
+            if let Err(err) = peer.on_clean().await {
+                log::error!("clean peer:{} error:{err}", peer)
+            }
+        }
+
         Ok(())
     }
 }
@@ -175,7 +199,7 @@ impl<T: IPeer + 'static> ILinkPeerManager for Actor<LinkPeerManager<T>> {
 
     #[inline]
     async fn cleans(&self) -> Result<()> {
-        self.inner_call(|inner| async move { inner.get_mut().cleans() })
+        self.inner_call(|inner| async move { inner.get_mut().cleans().await })
             .await
     }
 
