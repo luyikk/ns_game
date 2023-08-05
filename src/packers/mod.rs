@@ -5,7 +5,7 @@ pub mod update;
 use anyhow::Result;
 use serde::{Deserialize, Serialize};
 use serde_type_name::type_name;
-use std::borrow::Cow;
+
 
 /// 用于快速将packer转换成发送结果
 pub trait IntoResult {
@@ -13,14 +13,14 @@ pub trait IntoResult {
 }
 
 #[derive(Serialize)]
-pub struct SerializeSerialJson<'a, T: Serialize> {
+struct SerializeSerialJson<'a, T: Serialize> {
     serial: i64,
     func: &'a str,
     context: T,
 }
 
 #[derive(Serialize)]
-pub struct SerializeJson<'a, T: Serialize> {
+struct SerializeJson<'a, T: Serialize> {
     func: &'a str,
     context: T,
 }
