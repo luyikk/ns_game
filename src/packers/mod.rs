@@ -114,4 +114,6 @@ pub struct GetUserInfoResult<'a> {
     pub amount_of_wash_code: f64,
     /// 玩家vip等级
     pub vip_level: i32,
+    /// 汇率比例
+    pub money_exchange_coin: i64,
 }
