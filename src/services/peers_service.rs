@@ -173,6 +173,8 @@ pub trait ILinkPeerManagerPeer<T>: ILinkPeerManager {
     /// 根据账号id 获取所有的peer
     /// 一个账号可对应多个peer
     fn get_peer_by_account_id(&self, account_id: i32) -> Vec<Arc<T>>;
+    /// 获取所有peer
+    fn get_all_peer(&self) -> Vec<Arc<T>>;
 }
 
 #[async_trait::async_trait]
@@ -219,5 +221,10 @@ impl<T: IPeer + 'static> ILinkPeerManagerPeer<T> for Actor<LinkPeerManager<T>> {
     #[inline]
     fn get_peer_by_account_id(&self, account_id: i32) -> Vec<Arc<T>> {
         unsafe { self.deref_inner().get_peer_by_account_id(account_id) }
+    }
+
+    #[inline]
+    fn get_all_peer(&self) -> Vec<Arc<T>> {
+        unsafe { self.deref_inner().peers.values().cloned().collect() }
     }
 }
