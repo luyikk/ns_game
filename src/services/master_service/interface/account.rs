@@ -7,21 +7,12 @@ pub struct TableAccount {
     /// account id
     #[serde(default)]
     pub id: i32,
-    /// 子库标识
-    #[serde(default)]
-    pub cb_key: String,
     /// 昵称 默认就是账号id
     #[serde(default)]
     pub nickname: String,
     /// 头像
     #[serde(default)]
     pub avatar_id: i32,
-    /// 登录账号
-    #[serde(default)]
-    pub account: String,
-    /// 密码( 默认为空 )
-    #[serde(default)]
-    pub password: String,
     /// 邮箱
     #[serde(default)]
     pub email: String,
