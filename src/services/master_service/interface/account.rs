@@ -13,6 +13,10 @@ pub struct TableAccount {
     /// 头像
     #[serde(default)]
     pub avatar_id: i32,
+    /// 登录账号
+    #[serde(default)]
+    #[sqlx(default)]
+    pub account: String,
     /// 邮箱
     #[serde(default)]
     pub email: String,
