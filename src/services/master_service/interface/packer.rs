@@ -2,7 +2,7 @@ use super::account::*;
 use serde::{Deserialize, Serialize};
 
 /// 老虎机请求旋转
-#[derive(Deserialize, Serialize, Debug)]
+#[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct ReqSlotSpin {
     /// 游戏级别
     pub game_level_id: i32,
@@ -25,7 +25,7 @@ pub struct ReqSlotSpin {
 }
 
 /// 老虎机请求旋转结果
-#[derive(Deserialize, Serialize, Default)]
+#[derive(Deserialize, Serialize, Clone, Default)]
 pub struct SlotSpinRet {
     /// code
     pub code: i32,
@@ -34,7 +34,7 @@ pub struct SlotSpinRet {
 }
 
 /// 老虎机请求旋转结果内容
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Serialize, Clone)]
 pub struct SlotsSpinInfo {
     /// 账号id
     pub account_id: i32,
@@ -53,7 +53,7 @@ pub struct SlotsSpinInfo {
 }
 
 /// 老虎机请求退钱
-#[derive(Deserialize, Serialize, Debug)]
+#[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct ReqSlotRefund {
     /// 游戏级别
     pub game_level_id: i32,
@@ -67,7 +67,7 @@ pub struct ReqSlotRefund {
     pub lottery_id: i32,
 }
 
-#[derive(Deserialize, Serialize, Default)]
+#[derive(Deserialize, Serialize, Default, Clone)]
 pub struct SlotRefundRet {
     /// code
     pub code: i32,
@@ -75,7 +75,7 @@ pub struct SlotRefundRet {
     pub info: Option<SlotRefundInfo>,
 }
 
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Serialize, Clone)]
 pub struct SlotRefundInfo {
     /// 账号id
     pub account_id: i32,
@@ -90,7 +90,7 @@ pub struct SlotRefundInfo {
 }
 
 /// 游戏彩金信息
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Serialize, Clone)]
 pub struct LotteryInfo {
     /// 彩金ID
     pub lottery_id: i32,
