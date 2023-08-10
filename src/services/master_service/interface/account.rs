@@ -87,7 +87,7 @@ pub struct TableAccountMoney {
     pub income_money: f64,
 }
 
-#[derive(Clone, Deserialize, Serialize)]
+#[derive(Clone, Deserialize, Serialize, Debug)]
 pub struct AccountInfo {
     /// 账号信息
     pub account_content: TableAccount,
