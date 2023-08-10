@@ -7,6 +7,9 @@ pub struct TableAccount {
     /// account id
     #[serde(default)]
     pub id: i32,
+    /// 子库标识
+    #[serde(default)]
+    pub cb_key: String,
     /// 昵称 默认就是账号id
     #[serde(default)]
     pub nickname: String,
