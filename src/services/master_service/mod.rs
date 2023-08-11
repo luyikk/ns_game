@@ -65,8 +65,8 @@ impl MasterService {
     }
 
     #[inline]
-    pub async fn move_money_cache(&self,account_id:i32, money:i64)->Result<MoneyContext>{
+    pub async fn move_money_cache(&self, account_id: i32, money: i64) -> Result<MoneyContext> {
         let server = impl_ref!(self.client=>IMaster);
-        server.move_money_cache(account_id,money).await
+        server.move_money_cache(account_id, money).await
     }
 }
