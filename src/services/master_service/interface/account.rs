@@ -2,32 +2,20 @@ use serde::{Deserialize, Serialize};
 
 /// 玩家账号表
 /// table:account
-#[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct TableAccount {
+#[derive(Serialize, Deserialize, Debug, Clone, Default)]
+pub struct AccountContext {
     /// account id
     #[serde(default)]
     pub id: i32,
-    /// 子库标识
-    #[serde(default)]
-    pub cb_key: String,
     /// 昵称 默认就是账号id
     #[serde(default)]
     pub nickname: String,
     /// 头像
     #[serde(default)]
     pub avatar_id: i32,
-    /// 登录账号
-    #[serde(default)]
-    pub account: String,
     /// 邮箱
     #[serde(default)]
     pub email: String,
-    /// 设备号(手机唯一编号)
-    #[serde(default)]
-    pub device_id: String,
-    /// 创建时间. epoch 10m 精度. 所有表的这个字段都是这个格式
-    #[serde(default)]
-    pub create_time: i64,
     /// 最后登陆时间
     #[serde(default)]
     pub last_login_time: i64,
@@ -50,14 +38,17 @@ pub struct TableAccount {
 
 /// 玩家金币总表
 /// table:account_money
-#[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct TableAccountMoney {
+#[derive(Serialize, Deserialize, Debug, Clone, Default)]
+pub struct MoneyContext {
     /// 用户Id ( 随机 8 位整数 )
     #[serde(default)]
     pub id: i32,
     /// 账户余额( 保留4位小数位, 进部分游戏时会被清0, 结束时会兑换返还 )
     #[serde(default)]
     pub money: f64,
+    /// 隐藏金币
+    #[serde(default)]
+    pub money_cache: f64,
     /// 保险箱( 玩家可在账户余额间搬运数据 )
     #[serde(default)]
     pub money_safe: f64,
@@ -84,12 +75,15 @@ pub struct TableAccountMoney {
     pub income_money: f64,
 }
 
-#[derive(Clone, Deserialize, Serialize, Debug)]
-pub struct AccountInfo {
+#[derive(Clone, Deserialize, Serialize, Debug, Default)]
+pub struct AccountInfoRet {
     /// 账号信息
-    pub account_content: TableAccount,
+    #[serde(default)]
+    pub account_content: AccountContext,
     /// 金币信息
-    pub money_content: TableAccountMoney,
+    #[serde(default)]
+    pub money_content: MoneyContext,
     /// vip 等级
+    #[serde(default)]
     pub vip_level: i32,
 }

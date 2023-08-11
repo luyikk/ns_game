@@ -28,7 +28,7 @@ impl MasterService {
 
     /// 获取玩家基本信息
     #[inline]
-    pub async fn get_account_info(&self, account_id: i32) -> Result<Option<AccountInfo>> {
+    pub async fn get_account_info(&self, account_id: i32) -> Result<Option<AccountInfoRet>> {
         let server = impl_ref!(self.client=>IMaster);
         server.get_player_info(account_id).await
     }
@@ -62,5 +62,11 @@ impl MasterService {
     pub async fn get_lottery_info(&self, game_id: u32) -> Result<Vec<LotteryInfo>> {
         let server = impl_ref!(self.client=>IMaster);
         server.get_game_lottery(game_id).await
+    }
+
+    #[inline]
+    pub async fn move_money_cache(&self,account_id:i32, money:i64)->Result<MoneyContext>{
+        let server = impl_ref!(self.client=>IMaster);
+        server.move_money_cache(account_id,money).await
     }
 }
