@@ -6,14 +6,14 @@ use std::borrow::Cow;
 /// 返回 提供serial错误格式化
 /// ``` ignore
 /// ret_error!("error")
-/// ret_error!("error:{}",err)
-/// ret_error!("error:{err}")
+/// ret_error!(;"error:{}",err)
+/// ret_error!(;"error:{err}")
 /// ret_error!(serial,"error")
-/// ret_error!(serial,"error:{}",err)
-/// ret_error!(serial,"error:{err}")
+/// ret_error!(serial;"error:{}",err)
+/// ret_error!(serial;"error:{err}")
 /// ret_error!(serial,-10,"error")
-/// ret_error!(serial,-10,"error:{}",err)
-/// ret_error!(serial,-10,"error:{err}")
+/// ret_error!(serial,-10;"error:{}",err)
+/// ret_error!(serial,-10;"error:{err}")
 /// ```
 #[macro_export]
 macro_rules! ret_error {
@@ -41,11 +41,11 @@ macro_rules! ret_error {
 /// 返回 不提供serial 错误格式化
 /// ``` ignore
 /// ret_err!("error")
-/// ret_err!("error:{}",err)
-/// ret_err!("error:{err}")
+/// ret_err!(;"error:{}",err)
+/// ret_err!(;"error:{err}")
 /// ret_err!(-10,"error")
-/// ret_err!(-10,"error:{}",err)
-/// ret_err!(-10,"error:{err}")
+/// ret_err!(-10;"error:{}",err)
+/// ret_err!(-10;"error:{err}")
 /// ```
 #[macro_export]
 macro_rules! ret_err {
