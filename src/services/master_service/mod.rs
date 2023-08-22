@@ -64,9 +64,24 @@ impl MasterService {
         server.get_game_lottery(game_id).await
     }
 
+    /// 从money cache 移动钱到 money
     #[inline]
     pub async fn move_money_cache(&self, account_id: i32, money: i64) -> Result<MoneyContext> {
         let server = impl_ref!(self.client=>IMaster);
         server.move_money_cache(account_id, money).await
+    }
+
+    /// 机器人彩金旋转
+    #[inline]
+    pub async fn robot_lottery_spin(
+        &self,
+        loop_count: u32,
+        lottery_id: i32,
+        coin: f64,
+    ) -> Result<i64> {
+        let server = impl_ref!(self.client=>IMaster);
+        server
+            .robot_lottery_spin(loop_count, lottery_id, coin)
+            .await
     }
 }

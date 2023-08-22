@@ -40,4 +40,7 @@ pub trait IMaster {
     /// 将money cache 的钱挪到 money 如果不够返回false
     #[tag(105)]
     async fn move_money_cache(&self, account_id: i32, money: i64) -> Result<MoneyContext>;
+    /// 机器人模拟旋转加彩金
+    #[tag(106)]
+    async fn robot_lottery_spin(&self, loop_count: u32, lottery_id: i32, coin: f64) -> Result<i64>;
 }
