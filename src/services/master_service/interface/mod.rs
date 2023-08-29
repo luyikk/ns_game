@@ -43,4 +43,7 @@ pub trait IMaster {
     /// 机器人模拟旋转加彩金
     #[tag(106)]
     async fn robot_lottery_spin(&self, loop_count: u32, lottery_id: i32, coin: f64) -> Result<i64>;
+    /// 通知一批账号还活着 不要结存
+    #[tag(107)]
+    async fn alive_account(&self, account_ids: &[i32]);
 }

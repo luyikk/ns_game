@@ -27,8 +27,4 @@ pub trait IProxy {
     /// 发送到token
     #[tag(2020)]
     async fn send_to_token(&self, token: u64, data: &[u8]);
-
-    /// 通知一批账号还活着 不要结存
-    #[tag(107)]
-    async fn alive_account(&self, account_ids: &[i32]);
 }

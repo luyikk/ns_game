@@ -84,4 +84,11 @@ impl MasterService {
             .robot_lottery_spin(loop_count, lottery_id, coin)
             .await
     }
+
+    /// peer账号信息保活 不结存
+    #[inline]
+    pub async fn alive_account(&self, account_ids: &[i32]) {
+        let server = impl_ref!(self.client=>IMaster);
+        server.alive_account(account_ids).await
+    }
 }
