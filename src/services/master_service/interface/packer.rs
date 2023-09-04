@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 use super::account::*;
 
 /// 老虎机请求旋转
-#[derive(Serialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ReqSlotSpin {
     /// 游戏级别
     #[serde(default)]
@@ -37,7 +37,7 @@ pub struct ReqSlotSpin {
     pub spin_type: u32,
 }
 /// 老虎机请求退钱
-#[derive(Serialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ReqSlotRefund {
     /// 游戏级别
     #[serde(default)]
@@ -56,7 +56,7 @@ pub struct ReqSlotRefund {
     pub lottery_id: i32,
 }
 
-#[derive(Deserialize, Default, Debug, Clone)]
+#[derive(Deserialize, Serialize, Default, Debug, Clone)]
 pub struct SlotRefundRet {
     /// code
     #[serde(default)]
@@ -67,7 +67,7 @@ pub struct SlotRefundRet {
 }
 
 /// 老虎机请求旋转结果
-#[derive(Deserialize, Default, Debug, Clone)]
+#[derive(Deserialize, Serialize, Default, Debug, Clone)]
 pub struct SlotSpinRet {
     /// code
     #[serde(default)]
@@ -78,7 +78,7 @@ pub struct SlotSpinRet {
 }
 
 /// 老虎机请求旋转结果内容
-#[derive(Deserialize, Debug, Clone)]
+#[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct SlotsSpinInfo {
     /// 账号id
     #[serde(default)]
@@ -103,7 +103,7 @@ pub struct SlotsSpinInfo {
     pub level_ups: Vec<i64>,
 }
 
-#[derive(Deserialize, Debug, Clone)]
+#[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct SlotRefundInfo {
     /// 账号id
     #[serde(default)]
@@ -122,7 +122,7 @@ pub struct SlotRefundInfo {
 }
 
 /// 游戏彩金信息
-#[derive(Deserialize, Debug, Clone)]
+#[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct LotteryInfo {
     /// 彩金ID
     #[serde(default)]
