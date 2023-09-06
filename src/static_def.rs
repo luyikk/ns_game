@@ -49,7 +49,21 @@ pub fn load_content(filename: &str) -> std::io::Result<String> {
             );
             let path = Path::new(&json_path);
             if !path.exists() {
-                panic!("not found config file:{path:?}");
+                let json_path = format!(
+                    "{}/{}",
+                    current_dir()
+                        .expect("not found current dir")
+                        .parent()
+                        .expect("not found config file")
+                        .display(),
+                    filename
+                );
+                let path = Path::new(&json_path);
+                if !path.exists() {
+                    panic!("not found config file:{path:?}");
+                } else {
+                    path.to_path_buf()
+                }
             } else {
                 path.to_path_buf()
             }
