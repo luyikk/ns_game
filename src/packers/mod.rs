@@ -80,6 +80,10 @@ pub struct Pong {
 pub struct GetTokenResult {
     /// token
     pub token: u64,
+    /// 逝去时间
+    pub last_elapsed_time: i64,
     /// 超时时间
     pub timeout: i64,
+    /// websocket是否连接
+    pub is_wss_connect: bool,
 }

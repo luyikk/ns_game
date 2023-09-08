@@ -1,4 +1,5 @@
 use crate::controller::ProxyController;
+use crate::packers::GetTokenResult;
 use crate::services::IProxyService;
 use crate::static_def::PROXY;
 use crate::GAME;
@@ -28,6 +29,9 @@ pub trait IProxyController {
     /// 数据request
     #[tag(2001)]
     async fn func(&self, account_id: i32, token: u64, data: Vec<u8>) -> Result<Vec<u8>>;
+    /// 获取此用户所有token状态
+    #[tag(2002)]
+    async fn get_token_status(&self, account_id: i32) -> Result<Vec<GetTokenResult>>;
 }
 
 #[build_impl]
@@ -116,5 +120,21 @@ impl IProxyController for ProxyController {
     #[inline]
     async fn func(&self, account_id: i32, token: u64, data: Vec<u8>) -> Result<Vec<u8>> {
         (GAME.get().context("not found game install")?.func)(self, account_id, token, data).await
+    }
+
+    /// 获取此用户所有token状态
+    #[inline]
+    async fn get_token_status(&self, account_id: i32) -> Result<Vec<GetTokenResult>> {
+        let mut result = GAME
+            .get()
+            .context("not install game")
+            .unwrap()
+            .peers
+            .get_token_state_by_account_id(account_id)
+            .await;
+
+        result.sort_by_key(|x| x.last_elapsed_time);
+
+        Ok(result)
     }
 }

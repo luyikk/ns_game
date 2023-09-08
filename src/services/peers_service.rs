@@ -1,3 +1,4 @@
+use crate::packers::GetTokenResult;
 use anyhow::{bail, ensure, Result};
 use aqueue::Actor;
 use std::collections::HashMap;
@@ -73,6 +74,27 @@ impl<T: IPeer + 'static> LinkPeerManager<T> {
             .filter_map(|peer| {
                 if peer.get_account_id() == account_id {
                     Some(peer.clone())
+                } else {
+                    None
+                }
+            })
+            .collect()
+    }
+
+    /// 获取此账号的所有token状态
+    #[inline]
+    fn get_token_state_by_account_id(&self, account_id: i32) -> Vec<GetTokenResult> {
+        let now = timestamp();
+        self.peers
+            .values()
+            .filter_map(|peer| {
+                if peer.get_account_id() == account_id {
+                    Some(GetTokenResult {
+                        token: peer.get_token(),
+                        last_elapsed_time: peer.comparison_time(now),
+                        timeout: BASE_CONFIG.base.peer_clean_timeout_sec,
+                        is_wss_connect: !peer.is_disconnect(),
+                    })
                 } else {
                     None
                 }
@@ -159,6 +181,8 @@ pub trait ILinkPeerManager: Send + Sync {
     /// 长连接携带token链接
     /// 返回false表示token没找到
     async fn connect_token(&self, proxy_id: usize, account_id: i32, token: u64) -> Result<()>;
+    /// 获取此账号的所有token状态
+    async fn get_token_state_by_account_id(&self, account_id: i32) -> Vec<GetTokenResult>;
     /// 断线
     async fn disconnect_token(&self, token: u64);
     /// 清理需要清理的peer
@@ -189,6 +213,14 @@ impl<T: IPeer + 'static> ILinkPeerManager for Actor<LinkPeerManager<T>> {
     async fn connect_token(&self, proxy_id: usize, account_id: i32, token: u64) -> Result<()> {
         self.inner_call(
             |inner| async move { inner.get_mut().peer_connect(proxy_id, account_id, token) },
+        )
+        .await
+    }
+
+    #[inline]
+    async fn get_token_state_by_account_id(&self, account_id: i32) -> Vec<GetTokenResult> {
+        self.inner_call(
+            |inner| async move { inner.get_mut().get_token_state_by_account_id(account_id) },
         )
         .await
     }
