@@ -86,7 +86,6 @@ impl<T: IPeer + 'static> LinkPeerManager<T> {
     fn get_token_state_by_account_id(&self, account_id: i32) -> Vec<GetTokenResult> {
         let now = timestamp();
         self.peers
-            .clone()
             .values()
             .filter_map(|peer| {
                 if peer.get_account_id() == account_id {
@@ -183,7 +182,7 @@ pub trait ILinkPeerManager: Send + Sync {
     /// 返回false表示token没找到
     async fn connect_token(&self, proxy_id: usize, account_id: i32, token: u64) -> Result<()>;
     /// 获取此账号的所有token状态
-    fn get_token_state_by_account_id(&self, account_id: i32) -> Vec<GetTokenResult>;
+    async fn get_token_state_by_account_id(&self, account_id: i32) -> Vec<GetTokenResult>;
     /// 断线
     async fn disconnect_token(&self, token: u64);
     /// 清理需要清理的peer
@@ -219,8 +218,11 @@ impl<T: IPeer + 'static> ILinkPeerManager for Actor<LinkPeerManager<T>> {
     }
 
     #[inline]
-    fn get_token_state_by_account_id(&self, account_id: i32) -> Vec<GetTokenResult> {
-        unsafe { self.deref_inner().get_token_state_by_account_id(account_id) }
+    async fn get_token_state_by_account_id(&self, account_id: i32) -> Vec<GetTokenResult> {
+        self.inner_call(
+            |inner| async move { inner.get_mut().get_token_state_by_account_id(account_id) },
+        )
+        .await
     }
 
     #[inline]
