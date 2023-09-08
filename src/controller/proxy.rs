@@ -130,8 +130,7 @@ impl IProxyController for ProxyController {
             .context("not install game")
             .unwrap()
             .peers
-            .get_token_state_by_account_id(account_id)
-            .await;
+            .get_token_state_by_account_id(account_id);
 
         result.sort_by_key(|x| x.last_elapsed_time);
 
