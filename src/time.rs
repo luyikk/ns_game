@@ -18,31 +18,31 @@ pub const DAY: i64 = 24 * HOUR;
 /// 获取Utc时间戳 秒后 7个0
 #[inline]
 pub fn timestamp() -> i64 {
-    Utc::now().timestamp_nanos() / 100
+    Utc::now().timestamp_nanos_opt().unwrap() / 100
 }
 
 /// 获取UTC 毫秒时间戳
 #[inline]
 pub fn timestamp_milliseconds() -> i64 {
-    Utc::now().timestamp_nanos() / 1_000_000
+    Utc::now().timestamp_nanos_opt().unwrap() / 1_000_000
 }
 
 /// 从本地时间获取时间戳
 #[inline]
 pub fn timestamp_from_time(time: DateTime<Local>) -> i64 {
-    time.timestamp_nanos() / 100
+    time.timestamp_nanos_opt().unwrap() / 100
 }
 
 /// 获取本地时间戳
 #[inline]
 pub fn local_timestamp() -> i64 {
-    Local::now().timestamp_nanos() / 100
+    Local::now().timestamp_nanos_opt().unwrap() / 100
 }
 
 /// 从UTC时间获取时间戳
 #[inline]
 pub fn utc_timestamp_from_time(time: DateTime<Utc>) -> i64 {
-    time.timestamp_nanos() / 100
+    time.timestamp_nanos_opt().unwrap() / 100
 }
 
 /// 将时间戳转换成 时间
@@ -161,7 +161,8 @@ pub fn get_now_day_timestamp(timezone_minute: i64) -> i64 {
         .date()
         .and_hms_opt(0, 0, 0)
         .unwrap()
-        .timestamp_nanos()
+        .timestamp_nanos_opt()
+        .unwrap()
         / 100;
     let timezone = timezone_minute * MINUTE * TICK;
     utc_zero - timezone
@@ -186,7 +187,8 @@ pub fn get_utc_now_day_timestamp() -> i64 {
         .date_naive()
         .and_hms_opt(0, 0, 0)
         .unwrap()
-        .timestamp_nanos()
+        .timestamp_nanos_opt()
+        .unwrap()
         / 100
 }
 
