@@ -2,6 +2,7 @@ mod controller;
 mod interface;
 
 use crate::services::master_service::controller::MasterController;
+use crate::GAME;
 use anyhow::Result;
 pub use interface::*;
 use netxclient::prelude::*;
@@ -30,7 +31,13 @@ impl MasterService {
     #[inline]
     pub async fn get_account_info(&self, account_id: i32) -> Result<Option<AccountInfoRet>> {
         let server = impl_ref!(self.client=>IMaster);
-        server.get_player_info(account_id).await
+        let result = server.get_player_info(account_id).await?;
+        if result.is_none() {
+            if let Some(game) = GAME.get() {
+                game.peers.clean_by_account_id(account_id).await;
+            }
+        }
+        Ok(result)
     }
 
     /// 老虎机请求旋转

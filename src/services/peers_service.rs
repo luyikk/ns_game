@@ -139,6 +139,26 @@ impl<T: IPeer + 'static> LinkPeerManager<T> {
         }
     }
 
+    /// 删除指定玩家的peer
+    #[inline]
+    fn clean_by_account_id(&mut self, account_id: i32) {
+        let remove_list = self
+            .peers
+            .iter()
+            .filter_map(|(key, player)| {
+                if player.get_account_id() == account_id {
+                    Some(*key)
+                } else {
+                    None
+                }
+            })
+            .collect::<Vec<_>>();
+
+        for remove_key in remove_list {
+            self.peers.remove(&remove_key);
+        }
+    }
+
     /// 清理需要清理的peer
     #[inline]
     async fn cleans(&mut self) -> Result<()> {
@@ -189,6 +209,8 @@ pub trait ILinkPeerManager: Send + Sync {
     async fn cleans(&self) -> Result<()>;
     /// 从网关断线所有peer
     async fn disconnect_for_proxy(&self, proxy_id: usize);
+    /// 清理指定account id的账号
+    async fn clean_by_account_id(&self, account_id: i32);
 }
 
 pub trait ILinkPeerManagerPeer<T>: ILinkPeerManager {
@@ -240,6 +262,12 @@ impl<T: IPeer + 'static> ILinkPeerManager for Actor<LinkPeerManager<T>> {
     #[inline]
     async fn disconnect_for_proxy(&self, proxy_id: usize) {
         self.inner_call(|inner| async move { inner.get_mut().disconnect_for_proxy(proxy_id) })
+            .await
+    }
+
+    #[inline]
+    async fn clean_by_account_id(&self, account_id: i32) {
+        self.inner_call(|inner| async move { inner.get_mut().clean_by_account_id(account_id) })
             .await
     }
 }
