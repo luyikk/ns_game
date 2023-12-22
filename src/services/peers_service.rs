@@ -155,12 +155,14 @@ impl<T: IPeer + 'static> LinkPeerManager<T> {
             .collect::<Vec<_>>();
 
         for remove_key in remove_list {
-            if let Some(peer)= self.peers.remove(&remove_key){
-               if let Err(err)=  peer.on_clean().await{
-                   log::error!("clean peer:{} token:{remove_key} error:{err}",peer.get_account_id())
-               }
+            if let Some(peer) = self.peers.remove(&remove_key) {
+                if let Err(err) = peer.on_clean().await {
+                    log::error!(
+                        "clean peer:{} token:{remove_key} error:{err}",
+                        peer.get_account_id()
+                    )
+                }
             }
-
         }
     }
 
@@ -272,8 +274,10 @@ impl<T: IPeer + 'static> ILinkPeerManager for Actor<LinkPeerManager<T>> {
 
     #[inline]
     async fn clean_by_account_id(&self, account_id: i32) {
-        self.inner_call(|inner| async move { inner.get_mut().clean_by_account_id(account_id).await })
-            .await
+        self.inner_call(
+            |inner| async move { inner.get_mut().clean_by_account_id(account_id).await },
+        )
+        .await
     }
 }
 
