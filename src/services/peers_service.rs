@@ -157,10 +157,7 @@ impl<T: IPeer + 'static> LinkPeerManager<T> {
         for remove_key in remove_list {
             if let Some(peer) = self.peers.remove(&remove_key) {
                 if let Err(err) = peer.on_clean().await {
-                    log::error!(
-                        "clean peer:{} token:{remove_key} error:{err}",
-                        peer.get_account_id()
-                    )
+                    log::error!("clean peer:{peer} token:{remove_key} error:{err} 2")
                 }
             }
         }
