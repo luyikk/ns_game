@@ -20,6 +20,9 @@ impl MasterController {
 pub trait IMasterController {
     #[tag(connect)]
     async fn connected(&self) -> Result<()>;
+    /// ping
+    #[tag(1000)]
+    async fn ping(&self, time: i64) -> Result<i64>;
 }
 
 #[build_impl]
@@ -33,5 +36,12 @@ impl IMasterController for MasterController {
             panic!("register server id fail,check server id!!")
         }
         Ok(())
+    }
+
+    /// ping
+    #[inline]
+    async fn ping(&self, time: i64) -> Result<i64> {
+        log::debug!("master ping:{time}");
+        Ok(time)
     }
 }
