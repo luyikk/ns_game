@@ -196,6 +196,21 @@ impl<T: IPeer + 'static> LinkPeerManager<T> {
 
         Ok(())
     }
+
+    /// 清理所有peer
+    #[inline]
+    async fn clear_all(&mut self) {
+        let keys = self.peers.keys().cloned().collect::<Vec<_>>();
+        let clean_peers = keys
+            .into_iter()
+            .filter_map(|k| self.peers.remove(&k))
+            .collect::<Vec<_>>();
+        for peer in clean_peers {
+            if let Err(err) = peer.on_clean().await {
+                log::error!("clear all peer:{} error:{err}", peer)
+            }
+        }
+    }
 }
 
 #[async_trait::async_trait]
@@ -215,6 +230,8 @@ pub trait ILinkPeerManager: Send + Sync {
     async fn disconnect_for_proxy(&self, proxy_id: usize);
     /// 清理指定account id的账号
     async fn clean_by_account_id(&self, account_id: i32);
+    /// 清理所有token
+    async fn clear_all(&self);
 }
 
 pub trait ILinkPeerManagerPeer<T>: ILinkPeerManager {
@@ -275,6 +292,11 @@ impl<T: IPeer + 'static> ILinkPeerManager for Actor<LinkPeerManager<T>> {
             |inner| async move { inner.get_mut().clean_by_account_id(account_id).await },
         )
         .await
+    }
+    #[inline]
+    async fn clear_all(&self) {
+        self.inner_call(|inner| async move { inner.get_mut().clear_all().await })
+            .await
     }
 }
 

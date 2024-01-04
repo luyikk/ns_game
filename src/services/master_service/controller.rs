@@ -1,4 +1,5 @@
-use anyhow::Result;
+use crate::GAME;
+use anyhow::{Context, Result};
 use netxclient::prelude::*;
 
 use super::interface::*;
@@ -20,6 +21,8 @@ impl MasterController {
 pub trait IMasterController {
     #[tag(connect)]
     async fn connected(&self) -> Result<()>;
+    #[tag(disconnect)]
+    async fn disconnect(&self) -> Result<()>;
     /// ping
     #[tag(1000)]
     async fn ping(&self, time: i64) -> Result<i64>;
@@ -35,6 +38,18 @@ impl IMasterController for MasterController {
         } else {
             panic!("register server id fail,check server id!!")
         }
+        Ok(())
+    }
+
+    #[inline]
+    async fn disconnect(&self) -> Result<()> {
+        //和大厅断线处理
+        //清除所有的token 和peer
+        GAME.get()
+            .context("not found GAME?")?
+            .peers
+            .clear_all()
+            .await;
         Ok(())
     }
 
