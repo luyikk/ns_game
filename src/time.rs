@@ -21,6 +21,12 @@ pub fn timestamp() -> i64 {
     Utc::now().timestamp_nanos_opt().unwrap() / 100
 }
 
+/// 获取Utc时间戳 纳秒级
+#[inline]
+pub fn timestamp_nanos() -> u64 {
+    Utc::now().timestamp_nanos_opt().unwrap() as u64
+}
+
 /// 获取UTC 毫秒时间戳
 #[inline]
 pub fn timestamp_milliseconds() -> i64 {

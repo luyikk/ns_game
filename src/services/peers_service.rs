@@ -6,19 +6,17 @@ use std::sync::Arc;
 
 use crate::peer::IPeer;
 use crate::static_def::BASE_CONFIG;
-use crate::time::{timestamp, SECOND, TICK};
+use crate::time::{timestamp, timestamp_nanos, SECOND, TICK};
 
 /// PEER管理器
 pub struct LinkPeerManager<T> {
     peers: HashMap<u64, Arc<T>>,
-    index: u64,
 }
 
 impl<T> Default for LinkPeerManager<T> {
     fn default() -> Self {
         Self {
             peers: Default::default(),
-            index: 0,
         }
     }
 }
@@ -27,8 +25,7 @@ impl<T: IPeer + 'static> LinkPeerManager<T> {
     ///新建PEER
     #[inline]
     fn create_peer(&mut self, account_id: i32) -> Result<u64> {
-        self.index += 1;
-        let token = self.index;
+        let token = timestamp_nanos();
 
         ensure!(!self.peers.contains_key(&token), "token exits");
 
