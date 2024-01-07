@@ -25,7 +25,7 @@ impl<T: IPeer + 'static> LinkPeerManager<T> {
     ///新建PEER
     #[inline]
     fn create_peer(&mut self, account_id: i32) -> Result<u64> {
-        let token = timestamp_nanos() % 10000000000000;
+        let token = timestamp_nanos() % 100000000000000;
 
         ensure!(!self.peers.contains_key(&token), "token exits");
 
