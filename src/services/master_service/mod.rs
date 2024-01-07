@@ -49,7 +49,13 @@ impl MasterService {
         req: ReqSlotSpin,
     ) -> Result<SlotSpinRet> {
         let server = impl_ref!(self.client=>IMaster);
-        server.req_slot_spin(account_id, token, req).await
+        let result = server.req_slot_spin(account_id, token, req).await;
+        if result.is_err() {
+            if let Some(game) = GAME.get() {
+                game.peers.clean_by_account_id(account_id).await;
+            }
+        }
+        result
     }
 
     /// 老虎机请求退钱
@@ -61,7 +67,13 @@ impl MasterService {
         req: ReqSlotRefund,
     ) -> Result<SlotRefundRet> {
         let server = impl_ref!(self.client=>IMaster);
-        server.req_slot_refund(account_id, token, req).await
+        let result = server.req_slot_refund(account_id, token, req).await;
+        if result.is_err() {
+            if let Some(game) = GAME.get() {
+                game.peers.clean_by_account_id(account_id).await;
+            }
+        }
+        result
     }
 
     /// 获取彩金信息
@@ -75,7 +87,13 @@ impl MasterService {
     #[inline]
     pub async fn move_money_cache(&self, account_id: i32, money: i64) -> Result<MoneyContext> {
         let server = impl_ref!(self.client=>IMaster);
-        server.move_money_cache(account_id, money).await
+        let result = server.move_money_cache(account_id, money).await;
+        if result.is_err() {
+            if let Some(game) = GAME.get() {
+                game.peers.clean_by_account_id(account_id).await;
+            }
+        }
+        result
     }
 
     /// 机器人彩金旋转
